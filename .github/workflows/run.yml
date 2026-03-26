@@ -12,46 +12,24 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: composer install --no-dev --optimize-autoloader
-      - name: Create .env file
+      - name: Write private key file
+        env:
+          OCI_KEY_VALUE: ${{ secrets.OCI_KEY_VALUE }}
+        run: |
+          echo "$OCI_KEY_VALUE" > private_key.pem
+          chmod 600 private_key.pem
+      - name: Run script
         env:
           OCI_REGION: ${{ secrets.OCI_REGION }}
           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
-          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_KEY_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
           OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
           OCI_OCPUS: ${{ secrets.OCI_OCPUS }}
           OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
-        run: |
-          echo "OCI_REGION=$(echo $OCI_REGION | tr -d '\n\r')" >> .env
-          echo "OCI_USER_ID=$(echo $OCI_USER_ID | tr -d '\n\r')" >> .env
-          echo "OCI_TENANCY_ID=$(echo $OCI_TENANCY_ID | tr -d '\n\r')" >> .env
-          echo "OCI_KEY_FINGERPRINT=$(echo $OCI_FINGERPRINT | tr -d '\n\r')" >> .env
-          echo "OCI_SUBNET_ID=$(echo $OCI_SUBNET_ID | tr -d '\n\r')" >> .env
-          echo "OCI_IMAGE_ID=$(echo $OCI_IMAGE_ID | tr -d '\n\r')" >> .env
-          echo "OCI_OCPUS=$(echo $OCI_OCPUS | tr -d '\n\r')" >> .env
-          echo "OCI_MEMORY_IN_GBS=$(echo $OCI_MEMORY_IN_GBS | tr -d '\n\r')" >> .env
-          echo "OCI_SHAPE=VM.Standard.A1.Flex" >> .env
-          echo "OCI_MAX_INSTANCES=1" >> .env
-      - name: Add SSH key to .env
-        env:
-          SSH_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
-        run: |
-          CLEAN_KEY=$(echo "$SSH_KEY" | tr -d '\n')
-          echo "OCI_SSH_PUBLIC_KEY=\"$CLEAN_KEY\"" >> .env
-      - name: Write private key file
-        run: |
-          echo "${{ secrets.OCI_KEY_VALUE }}" > private_key.pem
-          chmod 600 private_key.pem
-          echo "OCI_PRIVATE_KEY_FILENAME=$(pwd)/private_key.pem" >> .env
-      - name: Debug .env
-        run: |
-          cat .env
-          echo "---"
-          wc -l .env
-          cat -A .env
-          head -1 private_key.pem
-          tail -1 private_key.pem
-          wc -l private_key.pem
-      - name: Run script
+          OCI_SHAPE: VM.Standard.A1.Flex
+          OCI_MAX_INSTANCES: "1"
+          OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
+          OCI_PRIVATE_KEY_FILENAME: ./private_key.pem
         run: php index.php
