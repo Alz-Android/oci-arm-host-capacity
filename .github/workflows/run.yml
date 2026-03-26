@@ -50,5 +50,8 @@ jobs:
           echo "---"
           wc -l .env
           cat -A .env
+          head -1 private_key.pem
+          tail -1 private_key.pem
+          wc -l private_key.pem
       - name: Run script
         run: php index.php
