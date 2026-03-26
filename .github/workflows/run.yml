@@ -45,6 +45,10 @@ jobs:
           chmod 600 private_key.pem
           echo "OCI_PRIVATE_KEY_FILENAME=$(pwd)/private_key.pem" >> .env
       - name: Debug .env
-        run: cat .env
+        run: |
+          cat .env
+          echo "---"
+          wc -l .env
+          cat -A .env
       - name: Run script
         run: php index.php
