@@ -24,7 +24,12 @@ jobs:
           echo "OCI_MEMORY_IN_GBS=${{ secrets.OCI_MEMORY_IN_GBS }}" >> .env
           echo "OCI_SHAPE=VM.Standard.A1.Flex" >> .env
           echo "OCI_MAX_INSTANCES=1" >> .env
-          echo "OCI_SSH_PUBLIC_KEY=\"$(echo ${{ secrets.OCI_SSH_PUBLIC_KEY }} | tr -d '\n')\"" >> .env
+      - name: Add SSH key to .env
+        env:
+          SSH_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
+        run: |
+          CLEAN_KEY=$(echo "$SSH_KEY" | tr -d '\n')
+          echo "OCI_SSH_PUBLIC_KEY=\"$CLEAN_KEY\"" >> .env
       - name: Write private key file
         run: |
           echo "${{ secrets.OCI_KEY_VALUE }}" > private_key.pem
