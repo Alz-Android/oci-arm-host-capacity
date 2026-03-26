@@ -13,15 +13,24 @@ jobs:
       - name: Install dependencies
         run: composer install --no-dev --optimize-autoloader
       - name: Create .env file
+        env:
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
+          OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
+          OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
+          OCI_OCPUS: ${{ secrets.OCI_OCPUS }}
+          OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
         run: |
-          echo "OCI_REGION=${{ secrets.OCI_REGION }}" >> .env
-          echo "OCI_USER_ID=${{ secrets.OCI_USER_ID }}" >> .env
-          echo "OCI_TENANCY_ID=${{ secrets.OCI_TENANCY_ID }}" >> .env
-          echo "OCI_KEY_FINGERPRINT=${{ secrets.OCI_FINGERPRINT }}" >> .env
-          echo "OCI_SUBNET_ID=${{ secrets.OCI_SUBNET_ID }}" >> .env
-          echo "OCI_IMAGE_ID=${{ secrets.OCI_IMAGE_ID }}" >> .env
-          echo "OCI_OCPUS=${{ secrets.OCI_OCPUS }}" >> .env
-          echo "OCI_MEMORY_IN_GBS=${{ secrets.OCI_MEMORY_IN_GBS }}" >> .env
+          echo "OCI_REGION=$(echo $OCI_REGION | tr -d '\n\r')" >> .env
+          echo "OCI_USER_ID=$(echo $OCI_USER_ID | tr -d '\n\r')" >> .env
+          echo "OCI_TENANCY_ID=$(echo $OCI_TENANCY_ID | tr -d '\n\r')" >> .env
+          echo "OCI_KEY_FINGERPRINT=$(echo $OCI_FINGERPRINT | tr -d '\n\r')" >> .env
+          echo "OCI_SUBNET_ID=$(echo $OCI_SUBNET_ID | tr -d '\n\r')" >> .env
+          echo "OCI_IMAGE_ID=$(echo $OCI_IMAGE_ID | tr -d '\n\r')" >> .env
+          echo "OCI_OCPUS=$(echo $OCI_OCPUS | tr -d '\n\r')" >> .env
+          echo "OCI_MEMORY_IN_GBS=$(echo $OCI_MEMORY_IN_GBS | tr -d '\n\r')" >> .env
           echo "OCI_SHAPE=VM.Standard.A1.Flex" >> .env
           echo "OCI_MAX_INSTANCES=1" >> .env
       - name: Add SSH key to .env
